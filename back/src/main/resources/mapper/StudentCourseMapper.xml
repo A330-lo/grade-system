@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scs.mapper.StudentCourseMapper">
+
+    <resultMap id="StudentCourseResultMap" type="com.scs.entity.StudentCourse">
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="select_time" property="selectTime"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <association property="student" javaType="com.scs.entity.Student">
+            <id column="student_id" property="id"/>
+            <result column="student_no" property="studentNo"/>
+            <result column="student_name" property="studentName"/>
+            <result column="gender" property="gender"/>
+            <result column="clazz_id" property="clazzId"/>
+            <result column="clazz_name" property="clazzName"/>
+        </association>
+        <association property="course" javaType="com.scs.entity.Course">
+            <id column="course_id" property="id"/>
+            <result column="course_name" property="courseName"/>
+            <result column="course_code" property="courseCode"/>
+            <result column="credit" property="credit"/>
+            <result column="course_type" property="courseType"/>
+            <result column="semester" property="semester"/>
+            <result column="classroom" property="classroom"/>
+            <result column="schedule" property="schedule"/>
+            <result column="teacher_name" property="teacherName"/>
+        </association>
+    </resultMap>
+
+    <select id="selectStudentCoursePage" resultMap="StudentCourseResultMap">
+        SELECT
+        sc.*,
+        s.student_no,
+        s.student_name,
+        c.course_name,
+        c.course_code,
+        c.credit,
+        t.teacher_name
+        FROM student_course sc
+        LEFT JOIN student s ON sc.student_id = s.id
+        LEFT JOIN course c ON sc.course_id = c.id
+        LEFT JOIN teacher t ON c.teacher_id = t.id
+        <where>
+            <if test="studentCourse.studentId != null">
+                AND sc.student_id = #{studentCourse.studentId}
+            </if>
+            <if test="studentCourse.courseId != null">
+                AND sc.course_id = #{studentCourse.courseId}
+            </if>
+            <if test="studentCourse.status != null">
+                AND sc.status = #{studentCourse.status}
+            </if>
+            <if test="studentNo != null and studentNo != ''">
+                AND s.student_no LIKE CONCAT('%', #{studentNo}, '%')
+            </if>
+            <if test="courseName != null and courseName != ''">
+                AND c.course_name LIKE CONCAT('%', #{courseName}, '%')
+            </if>
+        </where>
+        ORDER BY sc.id DESC
+    </select>
+
+    <select id="selectStudentCoursesByCourseId" resultMap="StudentCourseResultMap">
+        SELECT
+            sc.*,
+            s.student_no,
+            s.student_name,
+            s.gender,
+            s.clazz_id,
+            cl.clazz_name
+        FROM student_course sc
+                 LEFT JOIN student s ON sc.student_id = s.id
+                 LEFT JOIN clazz cl ON s.clazz_id = cl.id
+        WHERE sc.course_id = #{courseId}
+          AND sc.status = 1
+        ORDER BY s.student_no
+    </select>
+
+    <select id="selectStudentCoursesByStudentId" resultMap="StudentCourseResultMap">
+        SELECT
+            sc.*,
+            s.student_no,
+            s.student_name,
+            c.course_name,
+            c.course_code,
+            c.credit,
+            c.course_type,
+            c.semester,
+            c.classroom,
+            t.teacher_name,
+            CONCAT(
+                    CASE c.week_day
+                        WHEN 1 THEN '周一'
+                        WHEN 2 THEN '周二'
+                        WHEN 3 THEN '周三'
+                        WHEN 4 THEN '周四'
+                        WHEN 5 THEN '周五'
+                        WHEN 6 THEN '周六'
+                        WHEN 7 THEN '周日'
+                        END,
+                    c.start_section, '-', c.end_section, '节'
+            ) AS schedule
+        FROM student_course sc
+                 LEFT JOIN student s ON sc.student_id = s.id
+                 LEFT JOIN course c ON sc.course_id = c.id
+                 LEFT JOIN teacher t ON c.teacher_id = t.id
+        WHERE sc.student_id = #{studentId}
+          AND sc.status = 1
+        ORDER BY sc.select_time DESC
+    </select>
+</mapper>
