@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scs.mapper.CourseMapper">
+
+    <resultMap id="CourseResultMap" type="com.scs.entity.Course">
+        <id column="id" property="id"/>
+        <result column="course_name" property="courseName"/>
+        <result column="course_code" property="courseCode"/>
+        <result column="credit" property="credit"/>
+        <result column="class_hours" property="classHours"/>
+        <result column="semester" property="semester"/>
+        <result column="course_type" property="courseType"/>
+        <result column="max_student" property="maxStudent"/>
+        <result column="description" property="description"/>
+        <result column="teacher_id" property="teacherId"/>
+        <result column="classroom" property="classroom"/>
+        <result column="week_day" property="weekDay"/>
+        <result column="start_section" property="startSection"/>
+        <result column="end_section" property="endSection"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="teacher_name" property="teacherName"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="selected_count" property="selectedCount"/>
+    </resultMap>
+
+    <select id="selectCoursePage" resultMap="CourseResultMap">
+        SELECT
+            c.*,
+            t.teacher_name,
+            d.dept_name,
+            (SELECT COUNT(*) FROM student_course sc WHERE sc.course_id = c.id AND sc.status = 1) AS selected_count
+        FROM course c
+        LEFT JOIN teacher t ON c.teacher_id = t.id
+        LEFT JOIN department d ON t.dept_id = d.id
+        <where>
+            <if test="course.courseName != null and course.courseName != ''">
+                AND c.course_name LIKE CONCAT('%', #{course.courseName}, '%')
+            </if>
+            <if test="course.courseCode != null and course.courseCode != ''">
+                AND c.course_code LIKE CONCAT('%', #{course.courseCode}, '%')
+            </if>
+            <if test="course.teacherId != null">
+                AND c.teacher_id = #{course.teacherId}
+            </if>
+            <if test="course.semester != null and course.semester != ''">
+                AND c.semester = #{course.semester}
+            </if>
+            <if test="course.courseType != null and course.courseType != ''">
+                AND c.course_type = #{course.courseType}
+            </if>
+        </where>
+        ORDER BY c.id DESC
+    </select>
+
+</mapper>

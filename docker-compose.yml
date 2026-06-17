@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: grade-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Z12345.
+      MYSQL_DATABASE: student_course_system
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - grade-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: grade-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - grade-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: grade-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/student_course_system?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Z12345.
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - grade-net
+
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: grade-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - grade-net
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  grade-net:
+    driver: bridge

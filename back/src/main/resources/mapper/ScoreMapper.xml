@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scs.mapper.ScoreMapper">
+
+    <resultMap id="ScoreResultMap" type="com.scs.entity.Score">
+        <id column="id" property="id"/>
+        <result column="student_id" property="studentId"/>
+        <result column="course_id" property="courseId"/>
+        <result column="usual_score" property="usualScore"/>
+        <result column="final_score" property="finalScore"/>
+        <result column="total_score" property="totalScore"/>
+        <result column="gpa" property="gpa"/>
+        <result column="is_pass" property="isPass"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+        <result column="deleted" property="deleted"/>
+        <association property="student" javaType="com.scs.entity.Student">
+            <id column="student_id" property="id"/>
+            <result column="student_no" property="studentNo"/>
+            <result column="student_name" property="studentName"/>
+            <result column="gender" property="gender"/>
+            <result column="phone" property="phone"/>
+            <result column="email" property="email"/>
+            <result column="clazz_id" property="clazzId"/>
+            <result column="clazz_name" property="clazzName"/>
+        </association>
+        <association property="course" javaType="com.scs.entity.Course">
+            <id column="course_id" property="id"/>
+            <result column="course_name" property="courseName"/>
+            <result column="course_code" property="courseCode"/>
+            <result column="credit" property="credit"/>
+            <result column="course_type" property="courseType"/>
+            <result column="semester" property="semester"/>
+            <result column="teacher_name" property="teacherName"/>
+        </association>
+    </resultMap>
+
+    <select id="selectScorePage" resultMap="ScoreResultMap">
+        SELECT
+        sc.*,
+        s.student_no,
+        s.student_name,
+        s.gender,
+        s.phone,
+        s.email,
+        s.clazz_id,
+        cl.clazz_name,
+        c.course_name,
+        c.course_code,
+        c.credit,
+        c.course_type,
+        c.semester,
+        t.teacher_name
+        FROM score sc
+        LEFT JOIN student s ON sc.student_id = s.id
+        LEFT JOIN clazz cl ON s.clazz_id = cl.id
+        LEFT JOIN course c ON sc.course_id = c.id
+        LEFT JOIN teacher t ON c.teacher_id = t.id
+        <where>
+            sc.deleted = 0
+            <if test="score.studentId != null">
+                AND sc.student_id = #{score.studentId}
+            </if>
+            <if test="score.courseId != null">
+                AND sc.course_id = #{score.courseId}
+            </if>
+            <if test="score.isPass != null">
+                AND sc.is_pass = #{score.isPass}
+            </if>
+            <if test="score.status != null">
+                AND sc.status = #{score.status}
+            </if>
+        </where>
+        ORDER BY sc.id DESC
+    </select>
+
+    <select id="selectScoresByCourseId" resultMap="ScoreResultMap">
+        SELECT
+            sc.*,
+            s.id as student_id,
+            s.student_no,
+            s.student_name,
+            s.gender,
+            s.phone,
+            s.email,
+            s.clazz_id,
+            cl.clazz_name
+        FROM score sc
+                 LEFT JOIN student s ON sc.student_id = s.id
+                 LEFT JOIN clazz cl ON s.clazz_id = cl.id
+        WHERE sc.course_id = #{courseId}
+          AND sc.deleted = 0
+        ORDER BY s.student_no
+    </select>
+
+    <select id="selectStudentScorePage" resultMap="ScoreResultMap">
+        SELECT
+        sc.*,
+        s.student_no,
+        s.student_name,
+        c.course_name,
+        c.course_code,
+        c.credit,
+        c.course_type,
+        c.semester,
+        t.teacher_name
+        FROM score sc
+        LEFT JOIN student s ON sc.student_id = s.id
+        LEFT JOIN course c ON sc.course_id = c.id
+        LEFT JOIN teacher t ON c.teacher_id = t.id
+        <where>
+            sc.student_id = #{studentId}
+            AND sc.deleted = 0
+            AND sc.status = 1
+            <if test="semester != null and semester != ''">
+                AND c.semester = #{semester}
+            </if>
+            <if test="courseName != null and courseName != ''">
+                AND c.course_name LIKE CONCAT('%', #{courseName}, '%')
+            </if>
+        </where>
+        ORDER BY sc.id DESC
+    </select>
+</mapper>
