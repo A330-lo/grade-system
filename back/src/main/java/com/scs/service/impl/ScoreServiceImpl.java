@@ -7,6 +7,7 @@ import com.scs.exception.BusinessException;
 import com.scs.mapper.ScoreMapper;
 import com.scs.result.PageResult;
 import com.scs.service.ScoreService;
+import com.scs.utils.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,14 +38,24 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
     public void save(Score score) {
-        // 计算总成绩和绩点
+        validateScore(score);
         calculateScoreAndGpa(score);
         scoreMapper.insert(score);
     }
 
     @Override
     public void update(Score score) {
+        Score existScore = scoreMapper.selectById(score.getId());
+        if (existScore == null) {
+            throw new BusinessException("成绩记录不存在");
+        }
+        if (existScore.getStatus() != null && existScore.getStatus() == 1
+                && !"admin".equals(UserContext.getRole())) {
+            throw new BusinessException("已发布的成绩不可修改，请先退回");
+        }
+        validateScore(score);
         calculateScoreAndGpa(score);
+        score.setStatus(existScore.getStatus());
         scoreMapper.updateById(score);
     }
 
@@ -57,6 +68,7 @@ public class ScoreServiceImpl implements ScoreService {
     @Transactional(rollbackFor = Exception.class)
     public void batchSave(List<Score> scores) {
         for (Score score : scores) {
+            validateScore(score);
             calculateScoreAndGpa(score);
 
             // 检查是否已存在成绩
@@ -66,7 +78,10 @@ public class ScoreServiceImpl implements ScoreService {
             Score existScore = scoreMapper.selectOne(wrapper);
 
             if (existScore != null) {
-                // 更新，保持原状态
+                if (existScore.getStatus() != null && existScore.getStatus() == 1
+                        && !"admin".equals(UserContext.getRole())) {
+                    throw new BusinessException("已发布的成绩不可修改，请先退回");
+                }
                 score.setId(existScore.getId());
                 score.setStatus(existScore.getStatus() != null ? existScore.getStatus() : 0);
                 scoreMapper.updateById(score);
@@ -105,6 +120,26 @@ public class ScoreServiceImpl implements ScoreService {
         if (totalScore >= 64) return 1.5;
         if (totalScore >= 60) return 1.0;
         return 0.0;
+    }
+
+    /**
+     * 校验成绩范围：平时成绩和期末成绩必须在0-100之间
+     */
+    private void validateScore(Score score) {
+        BigDecimal usualScore = score.getUsualScore();
+        BigDecimal finalScore = score.getFinalScore();
+        BigDecimal min = BigDecimal.ZERO;
+        BigDecimal max = new BigDecimal("100");
+
+        if (usualScore != null && (usualScore.compareTo(min) < 0 || usualScore.compareTo(max) > 0)) {
+            throw new BusinessException("平时成绩必须在0-100之间");
+        }
+        if (finalScore != null && (finalScore.compareTo(min) < 0 || finalScore.compareTo(max) > 0)) {
+            throw new BusinessException("期末成绩必须在0-100之间");
+        }
+        if (usualScore == null && finalScore == null) {
+            throw new BusinessException("平时成绩和期末成绩不能同时为空");
+        }
     }
 
     /**

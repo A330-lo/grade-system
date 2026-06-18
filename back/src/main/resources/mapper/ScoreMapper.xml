@@ -78,7 +78,6 @@
     <select id="selectScoresByCourseId" resultMap="ScoreResultMap">
         SELECT
             sc.*,
-            s.id as student_id,
             s.student_no,
             s.student_name,
             s.gender,

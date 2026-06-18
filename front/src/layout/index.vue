@@ -3,15 +3,15 @@
     <!-- 侧边栏 -->
     <el-aside width="220px" class="sidebar">
       <div class="logo">
-        <el-icon size="28"><Reading /></el-icon>
+        <el-icon size="28"><Histogram/></el-icon>
         <span class="logo-text">学生课程成绩系统</span>
       </div>
       <el-menu
         :default-active="activeMenu"
         class="menu"
-        background-color="#001529"
-        text-color="#a6adb4"
-        active-text-color="#fff"
+        background-color="transparent"
+        text-color="#8899b4"
+        active-text-color="#5cb8ff"
         router
         :collapse="false"
       >
@@ -125,13 +125,14 @@ import {
   SwitchButton,
   HomeFilled,
   OfficeBuilding,
-  School,
   UserFilled,
   Tickets,
-  Setting,
-  Calendar,
   EditPen,
-  DataBoard
+  TrendCharts,
+  Notebook,
+  Collection,
+  Grid,
+  Histogram
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -180,10 +181,11 @@ const menuItems = computed(() => {
   if (role === 'admin') {
     menus.push(
       { path: '/home', title: '首页', icon: 'HomeFilled' },
+      { path: '/score', title: '成绩管理', icon: 'TrendCharts' },
       {
         path: '/system',
         title: '部门管理',
-        icon: 'Setting',
+        icon: 'OfficeBuilding',
         children: [
           { path: '/department', title: '学院管理' },
           { path: '/major', title: '专业管理' },
@@ -202,27 +204,26 @@ const menuItems = computed(() => {
       {
         path: '/course-manage',
         title: '课程管理',
-        icon: 'EditPen',
+        icon: 'Reading',
         children: [
           { path: '/course', title: '课程管理' },
           { path: '/student-course', title: '选课管理' }
         ]
       },
-      { path: '/score', title: '成绩管理', icon: 'DataBoard' },
     )
   } else if (role === 'teacher') {
     menus.push(
       { path: '/home', title: '首页', icon: 'HomeFilled' },
-      { path: '/teacher/courses', title: '授课查询', icon: 'EditPen' },
+      { path: '/teacher/courses', title: '授课查询', icon: 'Notebook' },
       { path: '/teacher/score', title: '成绩录入', icon: 'EditPen' },
-      { path: '/teacher/profile', title: '个人信息', icon: 'UserFilled' }
+      { path: '/teacher/profile', title: '个人信息', icon: 'User' }
     )
   } else if (role === 'student') {
     menus.push(
       { path: '/home', title: '首页', icon: 'HomeFilled' },
-      { path: '/student/my-courses', title: '我的课程', icon: 'EditPen' },
-      { path: '/student/score', title: '成绩查询', icon: 'DataBoard' },
-      { path: '/student/profile', title: '个人信息', icon: 'UserInfo' }
+      { path: '/student/my-courses', title: '我的课程', icon: 'Collection' },
+      { path: '/student/score', title: '成绩查询', icon: 'TrendCharts' },
+      { path: '/student/profile', title: '个人信息', icon: 'User' }
     )
   }
 
@@ -303,9 +304,10 @@ const handleUpdatePassword = async () => {
 }
 
 .sidebar {
-  background-color: #001529;
+  background: linear-gradient(180deg, #0b1322 0%, #111d32 100%);
   display: flex;
   flex-direction: column;
+  box-shadow: 2px 0 24px rgba(0, 0, 0, 0.3);
 
   .logo {
     height: 60px;
@@ -313,25 +315,71 @@ const handleUpdatePassword = async () => {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    color: #fff;
+    color: #e8f0fe;
     font-size: 18px;
     font-weight: bold;
-    border-bottom: 1px solid #1f3756;
+    border-bottom: 1px solid rgba(92, 184, 255, 0.12);
+    text-shadow: 0 0 20px rgba(92, 184, 255, 0.3);
+    letter-spacing: 0.05em;
 
     .logo-text {
       white-space: nowrap;
+      background: linear-gradient(135deg, #e8f0fe, #5cb8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
   }
 
   .menu {
     flex: 1;
     border-right: none;
+    padding: 8px 0;
+  }
+
+  :deep(.el-menu-item) {
+    margin: 2px 8px;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background-color: rgba(92, 184, 255, 0.08) !important;
+    }
+
+    &.is-active {
+      background: linear-gradient(135deg, rgba(64, 158, 255, 0.15), rgba(92, 184, 255, 0.08)) !important;
+      border-left: 3px solid #5cb8ff;
+      box-shadow: 0 0 16px rgba(92, 184, 255, 0.1) inset;
+    }
+  }
+
+  :deep(.el-sub-menu__title) {
+    margin: 2px 8px;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background-color: rgba(92, 184, 255, 0.08) !important;
+    }
+  }
+
+  :deep(.el-sub-menu.is-active .el-sub-menu__title) {
+    color: #5cb8ff !important;
+  }
+
+  :deep(.el-menu--inline) {
+    background: rgba(0, 0, 0, 0.15) !important;
+
+    .el-menu-item {
+      padding-left: 56px !important;
+    }
   }
 }
 
 .header {
-  background-color: #fff;
-  border-bottom: 1px solid #e6e6e6;
+  background-color: #dce3ea;
+  border-bottom: 1px solid #cdd4dd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -343,10 +391,11 @@ const handleUpdatePassword = async () => {
       align-items: center;
       gap: 10px;
       cursor: pointer;
-      color: #606266;
+      color: #334155;
 
       .avatar {
-        background-color: #409eff;
+        background: linear-gradient(135deg, #409eff, #5cb8ff);
+        box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
       }
 
       .username {
@@ -357,7 +406,7 @@ const handleUpdatePassword = async () => {
 }
 
 .main {
-  background-color: #f5f7fa;
+  background-color: #f0f4f8;
   padding: 20px;
   overflow-y: auto;
 }

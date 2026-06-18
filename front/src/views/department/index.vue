@@ -29,7 +29,6 @@
       </template>
 
       <el-table :data="tableData" v-loading="loading" border stripe>
-        <el-table-column type="selection" width="50" align="center" />
         <el-table-column prop="deptName" label="学院名称" align="center" />
         <el-table-column prop="deptCode" label="学院编码" align="center" />
         <el-table-column prop="createTime" label="创建时间" align="center" width="180">

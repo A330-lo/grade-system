@@ -20,7 +20,6 @@
       </template>
 
       <el-table :data="tableData" v-loading="loading" border stripe>
-        <el-table-column type="selection" width="50" align="center" />
         <el-table-column prop="courseName" label="课程名称" align="center" />
         <el-table-column prop="courseCode" label="课程编码" align="center" />
         <el-table-column prop="credit" label="学分" align="center" width="80" />

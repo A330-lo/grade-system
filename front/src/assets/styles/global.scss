@@ -10,7 +10,94 @@ html, body, #app {
   font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
   font-size: 14px;
   color: #303133;
-  background-color: #f5f7fa;
+  background-color: #f0f4f8;
+}
+
+// ========== 低饱和莫兰迪色系全局覆盖 ==========
+
+// 表格
+.el-table {
+  --el-table-border-color: #d8dce3;
+  --el-table-header-bg-color: #e8ecf0;
+  --el-table-row-hover-bg-color: #edf0f4;
+  --el-table-current-row-bg-color: #edf0f4;
+
+  th.el-table__cell {
+    background-color: #e8ecf0;
+    color: #5a6070;
+    font-weight: 600;
+  }
+}
+
+// 斑马纹
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+  background-color: #f4f5f7;
+}
+
+// 标签
+.el-tag {
+  --el-tag-border-color: transparent;
+
+  &.el-tag--primary {
+    --el-tag-bg-color: rgba(123, 143, 160, 0.15);
+    --el-tag-text-color: #7b8fa0;
+  }
+  &.el-tag--success {
+    --el-tag-bg-color: rgba(143, 170, 139, 0.15);
+    --el-tag-text-color: #8faa8b;
+  }
+  &.el-tag--danger {
+    --el-tag-bg-color: rgba(196, 155, 155, 0.15);
+    --el-tag-text-color: #c49b9b;
+  }
+  &.el-tag--warning {
+    --el-tag-bg-color: rgba(196, 184, 155, 0.15);
+    --el-tag-text-color: #c4b89b;
+  }
+  &.el-tag--info {
+    --el-tag-bg-color: rgba(155, 165, 180, 0.15);
+    --el-tag-text-color: #9ba5b4;
+  }
+}
+
+// 主按钮
+.el-button--primary {
+  --el-button-bg-color: #7b8fa0;
+  --el-button-border-color: #7b8fa0;
+  --el-button-hover-bg-color: #8a9dad;
+  --el-button-hover-border-color: #8a9dad;
+  --el-button-active-bg-color: #6d8193;
+  --el-button-active-border-color: #6d8193;
+}
+
+// 卡片
+.el-card {
+  --el-card-border-color: #d8dce3;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+// 分页高亮
+.el-pagination .is-active {
+  background-color: #7b8fa0 !important;
+}
+
+// 对话框
+.el-dialog {
+  border-radius: 12px;
+}
+
+// 输入框聚焦
+.el-input.is-focus .el-input__wrapper {
+  box-shadow: 0 0 0 1px #7b8fa0 inset !important;
+}
+.el-select .el-input.is-focus .el-input__wrapper {
+  box-shadow: 0 0 0 1px #7b8fa0 inset !important;
+}
+
+// 下拉菜单选中
+.el-select-dropdown__item.is-selected {
+  color: #7b8fa0;
 }
 
 a {

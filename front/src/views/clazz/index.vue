@@ -32,7 +32,6 @@
       </template>
 
       <el-table :data="tableData" v-loading="loading" border stripe>
-        <el-table-column type="selection" width="50" align="center" />
         <el-table-column prop="clazzName" label="班级名称" align="center" />
         <el-table-column prop="clazzCode" label="班级编码" align="center" />
         <el-table-column prop="grade" label="年级" align="center" />

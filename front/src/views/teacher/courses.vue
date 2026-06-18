@@ -3,7 +3,7 @@
     <el-card>
       <template #header>
         <div class="card-header">
-          <span>授课查询</span>
+          <span></span>
           <div class="header-actions">
             <el-select v-model="searchForm.semester" placeholder="选择学期" clearable class="search-select">
               <el-option label="2024-2025学年第一学期" value="2024-2025-1" />

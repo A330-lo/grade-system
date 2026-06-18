@@ -17,7 +17,6 @@
       </template>
 
       <el-table :data="tableData" v-loading="loading" border stripe>
-        <el-table-column type="selection" width="50" align="center" />
         <el-table-column prop="studentNo" label="学号" align="center" />
         <el-table-column prop="studentName" label="姓名" align="center" />
         <el-table-column prop="gender" label="性别" align="center" width="80" />

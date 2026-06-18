@@ -2,7 +2,7 @@
   <div class="student-profile-page">
     <el-card>
       <template #header>
-        <span>个人信息</span>
+        <span></span>
       </template>
 
       <div class="profile-container">

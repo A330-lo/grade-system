@@ -32,7 +32,6 @@
       </template>
 
       <el-table :data="tableData" v-loading="loading" border stripe>
-        <el-table-column type="selection" width="50" align="center" />
         <el-table-column prop="majorName" label="专业名称" align="center" />
         <el-table-column prop="majorCode" label="专业编码" align="center" />
         <el-table-column label="所属学院" align="center">

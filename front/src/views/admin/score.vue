@@ -119,10 +119,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="平时成绩" prop="usualScore">
-          <el-input-number v-model="formData.usualScore" :min="0" :max="100" :step="0.1" style="width: 100%" />
+          <el-input-number v-model="formData.usualScore" :step="0.1" style="width: 100%" />
         </el-form-item>
         <el-form-item label="期末成绩" prop="finalScore">
-          <el-input-number v-model="formData.finalScore" :min="0" :max="100" :step="0.1" style="width: 100%" />
+          <el-input-number v-model="formData.finalScore" :step="0.1" style="width: 100%" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -146,7 +146,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Plus } from '@element-plus/icons-vue'
 import request from '@/utils/request'
@@ -195,11 +195,27 @@ const formData = reactive({
   finalScore: 0
 })
 
+const validateScoreRange = (rule, value, callback) => {
+  if (value === null || value === undefined || value === '') {
+    callback(new Error('不能为空'))
+  } else if (value < 0 || value > 100) {
+    callback(new Error('必须在 0-100 之间'))
+  } else {
+    callback()
+  }
+}
+
 const rules = {
   studentId: [{ required: true, message: '请选择学生', trigger: 'change' }],
   courseId: [{ required: true, message: '请选择课程', trigger: 'change' }],
-  usualScore: [{ required: true, message: '请输入平时成绩', trigger: 'blur' }],
-  finalScore: [{ required: true, message: '请输入期末成绩', trigger: 'blur' }]
+  usualScore: [
+    { required: true, message: '请输入平时成绩', trigger: 'blur' },
+    { validator: validateScoreRange, trigger: ['blur', 'change'] }
+  ],
+  finalScore: [
+    { required: true, message: '请输入期末成绩', trigger: 'blur' },
+    { validator: validateScoreRange, trigger: ['blur', 'change'] }
+  ]
 }
 
 const fetchOptions = async () => {
@@ -297,17 +313,16 @@ const handleDialogClose = () => {
   resetForm()
 }
 
+watch(() => formData.usualScore, () => {
+  if (dialogVisible.value) formRef.value?.validateField('usualScore')
+})
+watch(() => formData.finalScore, () => {
+  if (dialogVisible.value) formRef.value?.validateField('finalScore')
+})
+
 const handleSubmit = async () => {
   await formRef.value?.validate(async (valid) => {
     if (!valid) return
-    if (formData.usualScore < 0 || formData.usualScore > 100) {
-      ElMessage.warning('平时成绩必须在0-100之间')
-      return
-    }
-    if (formData.finalScore < 0 || formData.finalScore > 100) {
-      ElMessage.warning('期末成绩必须在0-100之间')
-      return
-    }
     submitLoading.value = true
     try {
       if (isEdit.value) {
@@ -400,13 +415,17 @@ const handleBatchPublish = () => {
     ElMessage.warning('请先选择成绩记录')
     return
   }
-  ElMessageBox.confirm(
-    `确定要批量发布选中的 ${selectedRows.value.length} 条成绩记录吗？`,
-    '批量发布',
-    { type: 'info' }
-  ).then(async () => {
+  const validRows = selectedRows.value.filter(row => row.status !== 1)
+  const skipped = selectedRows.value.length - validRows.length
+  if (validRows.length === 0) {
+    ElMessage.warning('所选记录均为已发布状态，无需再次发布')
+    return
+  }
+  let msg = `确定要批量发布选中的 ${validRows.length} 条成绩记录吗？`
+  if (skipped > 0) msg += `（已跳过 ${skipped} 条已发布记录）`
+  ElMessageBox.confirm(msg, '批量发布', { type: 'info' }).then(async () => {
     try {
-      const ids = selectedRows.value.map(row => row.id)
+      const ids = validRows.map(row => row.id)
       await request.put('/score/publish-batch', ids)
       ElMessage.success('批量发布成功')
       selectedRows.value = []
@@ -423,13 +442,17 @@ const handleBatchReject = () => {
     ElMessage.warning('请先选择成绩记录')
     return
   }
-  ElMessageBox.confirm(
-    `确定要批量撤回选中的 ${selectedRows.value.length} 条成绩记录吗？`,
-    '批量撤回',
-    { type: 'warning' }
-  ).then(async () => {
+  const validRows = selectedRows.value.filter(row => row.status !== 0)
+  const skipped = selectedRows.value.length - validRows.length
+  if (validRows.length === 0) {
+    ElMessage.warning('所选记录均为待审核状态，无需撤回')
+    return
+  }
+  let msg = `确定要批量撤回选中的 ${validRows.length} 条成绩记录吗？`
+  if (skipped > 0) msg += `（已跳过 ${skipped} 条待审核记录）`
+  ElMessageBox.confirm(msg, '批量撤回', { type: 'warning' }).then(async () => {
     try {
-      const ids = selectedRows.value.map(row => row.id)
+      const ids = validRows.map(row => row.id)
       await request.put('/score/reject-batch', ids)
       ElMessage.success('批量撤回成功')
       selectedRows.value = []

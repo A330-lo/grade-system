@@ -63,12 +63,6 @@ const routes = [
         meta: { title: '选课管理', requiresAuth: true, roles: ['admin'] }
       },
       {
-        path: '/course-teacher',
-        name: 'CourseTeacher',
-        component: () => import('@/views/course-teacher/index.vue'),
-        meta: { title: '授课管理', requiresAuth: true, roles: ['admin'] }
-      },
-      {
         path: '/score',
         name: 'Score',
         component: () => import('@/views/admin/score.vue'),

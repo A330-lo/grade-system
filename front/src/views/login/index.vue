@@ -11,6 +11,7 @@
         :model="loginForm"
         :rules="loginRules"
         class="login-form"
+        autocomplete="off"
         @keyup.enter="handleLogin"
       >
         <el-form-item prop="username">
@@ -19,6 +20,7 @@
             :placeholder="placeholderText.username"
             size="large"
             prefix-icon="User"
+            autocomplete="off"
           />
         </el-form-item>
 
@@ -30,6 +32,7 @@
             size="large"
             prefix-icon="Lock"
             show-password
+            autocomplete="new-password"
           />
         </el-form-item>
 
@@ -90,8 +93,8 @@ const loginFormRef = ref(null)
 const loading = ref(false)
 
 const loginForm = reactive({
-  username: 'admin',
-  password: '123456',
+  username: '',
+  password: '',
   role: 'admin'
 })
 
@@ -154,35 +157,50 @@ const handleLogin = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1e3a5f, #0d1b2a);
+  background: linear-gradient(135deg, #3e4e62 0%, #6b7d94 50%, #9aacbf 100%);
   position: relative;
   overflow: hidden;
 
   &::before {
     content: '';
     position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 30% 20%, rgba(70, 130, 200, 0.22) 0%, transparent 58%);
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+    top: -200px;
+    right: -150px;
     pointer-events: none;
+    animation: float 8s ease-in-out infinite;
   }
   &::after {
     content: '';
     position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 70% 80%, rgba(50, 100, 170, 0.16) 0%, transparent 62%);
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+    bottom: -150px;
+    left: -100px;
     pointer-events: none;
+    animation: float 10s ease-in-out infinite reverse;
   }
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -20px) scale(1.05); }
 }
 
 .login-box {
   width: 420px;
-  background: rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-radius: 14px;
-  padding: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 44px 40px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   position: relative;
   z-index: 1;
 }
@@ -236,22 +254,23 @@ const handleLogin = async () => {
     text-align: center;
     padding: 10px 0;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    color: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.65);
     cursor: pointer;
     transition: all 0.25s ease;
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.04);
     user-select: none;
+    backdrop-filter: blur(4px);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.1);
       color: #fff;
     }
     &.active {
-      background: linear-gradient(135deg, #1e3a5f, #0d1b2a);
-      border-color: transparent;
+      background: linear-gradient(135deg, rgba(92, 184, 255, 0.25), rgba(64, 158, 255, 0.15));
+      border-color: rgba(92, 184, 255, 0.4);
       color: #fff;
-      box-shadow: 0 4px 12px rgba(30, 58, 95, 0.4);
+      box-shadow: 0 0 20px rgba(92, 184, 255, 0.15);
     }
   }
 
@@ -261,12 +280,13 @@ const handleLogin = async () => {
     font-size: 16px;
     margin-top: 10px;
     border: none;
-    background: linear-gradient(135deg, #1e3a5f, #0d1b2a);
+    background: linear-gradient(135deg, #5cb8ff, #409eff);
     transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(64, 158, 255, 0.3);
 
     &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(30, 58, 95, 0.55);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(64, 158, 255, 0.45);
     }
     &:active {
       transform: translateY(0);
