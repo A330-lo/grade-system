@@ -23,11 +23,12 @@ public class MybatisPlusConfig {
     }
 
     @Bean
-    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource, MybatisPlusInterceptor mybatisPlusInterceptor) throws Exception {
         MybatisSqlSessionFactoryBean sessionFactory = new MybatisSqlSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);
         sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:mapper/*.xml"));
         sessionFactory.setTypeAliasesPackage("com.scs.entity");
+        sessionFactory.setPlugins(mybatisPlusInterceptor);
         return sessionFactory.getObject();
     }
 
